@@ -9,4 +9,4 @@ const myDataSource = new DataSource({
 })
 
 export { myDataSource }
-export { url } from './entity/Url.entity'
+export { url } from './entity/url.entity'
