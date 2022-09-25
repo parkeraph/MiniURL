@@ -10,3 +10,4 @@ const myDataSource = new DataSource({
 
 export { myDataSource }
 export { url } from './entity/url.entity'
+export { config } from './entity/config.entity'

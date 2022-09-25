@@ -4,30 +4,36 @@ import fs from "fs";
 
 //type imports
 import { Request, Response } from "express";
+import { CreateResponse, CreateRequest } from "./models";
 
 //local imports
-import { myDataSource, url } from "./database";
-import { getSecondsTimestamp, encode } from "./utilities"
+import { myDataSource, url, config } from "./database";
+import { getSecondsTimestamp, encode } from "./utilities";
 
 myDataSource.initialize()
-    .then(() => { console.info("Database Initialized") })
+    .then(() => {console.info("Database Initialized")})
     .catch(() => {console.error("Database Initialization failed") });
 
 const app = express();
 app.use(express.json())
 const port = 3000;
+const domain = process.env.DOMAIN || 'localhost';
+
+const getView = (viewPath : string) => {
+  return new Promise((res, rej) => {
+    fs.readFile(path.resolve(viewPath), "utf8", (err, data) => {
+      if (err) {
+        console.error(err);
+        rej("could not find resource "+viewPath);
+      }
+  
+      res(data);
+    })
+  })
+}
 
 app.get("/", async (req : Request, res : Response) => {
-  const data = fs.readFile(path.resolve("src/createUrl.html"), "utf8", (err, data) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).send("An error occurred");
-    }
-
-    return res.send(
-      data
-    );
-  })
+    res.send(await getView('src/views/createUrl.html'))
 });
 
 //TODO: add 404 
@@ -35,7 +41,10 @@ app.get("/:urlHash", async (req : Request, res : Response) => {
   try {
 
     const urlEntry = await myDataSource.getRepository(url).findOneBy({mini_url: req.params.urlHash});
-    return res.send(urlEntry)
+
+    if(!urlEntry) return res.send(await getView('src/views/404.html'));
+
+    return res.redirect(urlEntry.full_url);
 
   } catch (err) {
     console.error(err);
@@ -64,7 +73,7 @@ app.post("/create", async (req : Request, res : Response) => {
       }
     })
 
-    if(preexistingEntry) return res.send(preexistingEntry);
+    if(preexistingEntry) return res.send(getURLCreationResponse(preexistingEntry));
 
     //insert entry without mini_url
     await urlRepo.insert({
@@ -74,7 +83,7 @@ app.post("/create", async (req : Request, res : Response) => {
     });
 
     //get new entry id
-    const newlyCreatedEntry = await urlRepo.findOne({
+    let newlyCreatedEntry = await urlRepo.findOne({
       where: {
         full_url: requestedFullURl
       }
@@ -84,9 +93,10 @@ app.post("/create", async (req : Request, res : Response) => {
     if(newlyCreatedEntry !== null) {
       const newMiniUrlCode = encode(newlyCreatedEntry.id.toString());
       await urlRepo.update({id: newlyCreatedEntry.id}, {mini_url: newMiniUrlCode})
-      
-      //TODO: use an environment variable to send domain with URL code 
-      return res.send({success: true, mini_url: newMiniUrlCode})
+      const updatedEntry = await urlRepo.findOne({where: {id: newlyCreatedEntry.id}});
+
+      return res.send(getURLCreationResponse(updatedEntry));
+
     } else {
       throw "Database write error"
     }
@@ -97,10 +107,33 @@ app.post("/create", async (req : Request, res : Response) => {
   }
 });
 
+const getURLCreationResponse = (urlEntity : url | null) : CreateResponse => {
+  if(urlEntity){
+    console.log({
+      success: true,
+      mini_url_code: urlEntity.mini_url,
+      mini_url: "https://"+domain+":"+port+"/"+urlEntity.mini_url
+    })
+
+
+    return {
+      success: true,
+      mini_url_code: urlEntity.mini_url,
+      mini_url: domain+":"+port+"/"+urlEntity.mini_url
+    }
+  } else {
+    return {
+      success: false,
+      mini_url_code: "",
+      mini_url: ""
+    }
+  }
+}
+
 app.use(
   express.static(path.resolve(__dirname, ".", "dist"), { maxAge: "30d" })
 );
 
-app.listen(port, function () {
+app.listen(port, async () => {
   console.log(`Example app listening on port ${port}!`);
 });
