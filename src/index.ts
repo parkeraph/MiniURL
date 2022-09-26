@@ -40,7 +40,10 @@ app.get("/", async (req: Request, res: Response) => {
 
 app.get("/:urlHash", async (req: Request, res: Response) => {
   //TODO: add body validation
-  const response = await urlManager.getMiniURL(req.body);
+
+  const response = await urlManager.getMiniURL({
+    miniURLCode: req.params.urlHash,
+  });
 
   if (response.success) {
     return response.exists

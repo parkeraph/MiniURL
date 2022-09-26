@@ -38,7 +38,7 @@ export default class URLManager implements IURLManager {
       return {
         success: true,
         exists: true,
-        fullURL: "http://" + urlEntry.full_url,
+        fullURL: urlEntry.full_url,
       };
     } catch (e) {
       return {
