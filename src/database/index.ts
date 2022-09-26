@@ -1,13 +1,13 @@
-import { DataSource } from "typeorm"
+import { DataSource } from "typeorm";
 
 const myDataSource = new DataSource({
-    type: "sqlite",
-    database: __dirname + "/../../MiniURL.db",
-    entities: [__dirname + "/../**/*.entity.{js,ts}"],
-    logging: true,
-    synchronize: true,
-})
+  type: "sqlite",
+  database: __dirname + "/../../MiniURL.db",
+  entities: [__dirname + "/../**/*.entity.{js,ts}"],
+  logging: true,
+  synchronize: true,
+});
 
-export { myDataSource }
-export { url } from './entity/url.entity'
-export { config } from './entity/config.entity'
+export { myDataSource };
+export { url } from "./entity/url.entity";
+export { config } from "./entity/config.entity";

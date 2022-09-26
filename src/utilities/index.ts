@@ -1,2 +1,2 @@
-export { getSecondsTimestamp } from './time';
-export { encode, decode } from './base64';
+export { getSecondsTimestamp } from "./time";
+export { encode, decode } from "./base64";
