@@ -1,2 +1,4 @@
-export { default as CreateResponse } from "./createResponse";
-export { default as CreateRequest } from "./createRequest";
+export { default as MiniURLCreateResponse } from "./MiniURLCreateResponse";
+export { default as MiniURLCreateRequest } from "./MiniURLCreateRequest";
+export { default as MiniURLGetResponse } from "./MiniURLGetResponse";
+export { default as MiniURLGetRequest } from "./MiniURLGetRequest";

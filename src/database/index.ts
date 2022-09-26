@@ -1,6 +1,6 @@
 import { DataSource } from "typeorm";
 
-const myDataSource = new DataSource({
+const dataSource = new DataSource({
   type: "sqlite",
   database: __dirname + "/../../MiniURL.db",
   entities: [__dirname + "/../**/*.entity.{js,ts}"],
@@ -8,6 +8,5 @@ const myDataSource = new DataSource({
   synchronize: true,
 });
 
-export { myDataSource };
-export { url } from "./entity/url.entity";
-export { config } from "./entity/config.entity";
+export { dataSource };
+export { default as URL } from "./entity/URL.entity";
