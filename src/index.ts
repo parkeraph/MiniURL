@@ -46,6 +46,7 @@ app.get("/:urlHash", async (req: Request, res: Response) => {
   });
 
   if (response.success) {
+    console.log("Redirection to: ", response);
     return response.exists
       ? res.redirect(response.fullURL)
       : res.send(await viewManager.getView("src/views/404.html"));
@@ -60,6 +61,7 @@ app.post("/create", async (req: Request, res: Response) => {
   const response = await urlManager.createMiniURL(req.body);
 
   if (response.success) {
+    console.log("Created new entry: ", response);
     return res.send(response);
   } else {
     return res.status(500).send(response);

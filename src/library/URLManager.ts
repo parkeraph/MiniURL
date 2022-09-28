@@ -54,6 +54,11 @@ export default class URLManager implements IURLManager {
     request: MiniURLCreateRequest
   ): Promise<MiniURLCreateResponse> => {
     try {
+      //check if the url has a http:// prefix, if not add
+      if (!/^(http|https):\/\/.*/.test(request.full_url)) {
+        request.full_url = "https://" + request.full_url;
+      }
+
       const urlRepo = this.dataSource.getRepository(URL);
 
       //check if record for the full_url already exists
@@ -63,8 +68,9 @@ export default class URLManager implements IURLManager {
         },
       });
 
-      if (preexistingEntry)
+      if (preexistingEntry) {
         return this.getURLCreationResponse(preexistingEntry);
+      }
 
       //insert entry without mini_url
       await urlRepo.insert({
