@@ -21,7 +21,7 @@ dataSource
 
 const app = express();
 app.use(express.json());
-const port = 3000;
+const port = Number(process.env.PORT) || 80;
 const domain = process.env.DOMAIN || "localhost";
 
 const viewManager = new ViewManager();

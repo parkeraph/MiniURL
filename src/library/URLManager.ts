@@ -112,18 +112,20 @@ export default class URLManager implements IURLManager {
   };
 
   getURLCreationResponse = (urlEntity: URL | null): MiniURLCreateResponse => {
+    const urlPort = () => (this.port === 80 ? "" : ":" + this.port);
+
     if (urlEntity) {
       console.log({
         success: true,
         mini_url_code: urlEntity.mini_url,
         mini_url:
-          "https://" + this.domain + ":" + this.port + "/" + urlEntity.mini_url,
+          "https://" + this.domain + urlPort() + "/" + urlEntity.mini_url,
       });
 
       return {
         success: true,
         mini_url_code: urlEntity.mini_url,
-        mini_url: this.domain + ":" + this.port + "/" + urlEntity.mini_url,
+        mini_url: this.domain + urlPort() + "/" + urlEntity.mini_url,
       };
     } else {
       return {
